@@ -7,16 +7,7 @@ import { Sparkles } from "lucide-react";
 import InputPassword from "../component/ui/InputPasword";
 import Button from "../component/ui/Button";
 import { useAuthStore } from "../store/useAuthStore";
-import { useAdminAccountsStore } from "../store/useAdminAccounts";
-import type { Role } from "../types/Auth";
-
-// Sama seperti LoginForm: role ditentukan dari email yang terdaftar di "Kelola Admin".
-function resolveRole(email: string): Role {
-  const account = useAdminAccountsStore
-    .getState()
-    .admins.find((a: { email: string; }) => a.email.toLowerCase() === email.toLowerCase());
-  return account?.role ?? "user";
-}
+import { registerApi } from "../services/skincareApi";
 
 const schema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -32,17 +23,27 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    await new Promise((r) => setTimeout(r, 400));
-    const role = resolveRole(data.email);
-    login({
-      user: { id: "u-new", name: data.name, email: data.email, role },
-      token: "demo-token",
-    });
-    navigate(role === "user" ? "/" : "/dashboard");
+    try {
+      const result = await registerApi(data.name, data.email, data.password);
+      login({
+        user: {
+          id: result.user.id,
+          name: result.user.username,
+          email: result.user.email,
+          role: result.user.role ?? "user",
+        },
+        token: result.token,
+      });
+      navigate("/");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "Gagal mendaftar";
+      setError("email", { message: msg });
+    }
   };
 
   return (

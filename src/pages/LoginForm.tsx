@@ -7,8 +7,7 @@ import { Sparkles } from "lucide-react";
 import InputPassword from "../component/ui/InputPasword";
 import Button from "../component/ui/Button";
 import { useAuthStore } from "../store/useAuthStore";
-import { useAdminAccountsStore } from "../store/useAdminAccounts";
-import type { Role } from "../types/Auth";
+import { loginApi } from "../services/skincareApi";
 
 const schema = z.object({
   email: z.string().email("Email tidak valid"),
@@ -17,40 +16,34 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-// Demo: role ditentukan dari email yang terdaftar di menu "Kelola Admin".
-// Email yang tidak terdaftar di sana otomatis jadi role "user".
-function resolveRole(email: string): Role {
-  const account = useAdminAccountsStore
-    .getState()
-    .admins.find((a: { email: string; role: Role }) => a.email.toLowerCase() === email.toLowerCase());
-  return account?.role ?? "user";
-}
-
-const ROLE_LABEL: Record<Role, string> = {
-  super_admin: "Super Admin",
-  admin: "Admin",
-  user: "Pengguna",
-};
-
 export default function LoginForm() {
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    // Demo: belum tersambung ke backend nyata (lihat src/lib/axios.ts untuk koneksi API).
-    // Login selalu berhasil; role-nya ditentukan dari daftar akun di "Kelola Admin".
-    await new Promise((r) => setTimeout(r, 400));
-    const role = resolveRole(data.email);
-    login({
-      user: { id: "u1", name: ROLE_LABEL[role], email: data.email, role },
-      token: "demo-token",
-    });
-    navigate(role === "user" ? "/" : "/dashboard");
+    try {
+      const result = await loginApi(data.email, data.password);
+      login({
+        user: {
+          id: result.user.id,
+          name: result.user.username,
+          email: result.user.email,
+          role: result.user.role ?? "user",
+        },
+        token: result.token,
+      });
+      const role = result.user.role ?? "user";
+      navigate(role === "user" ? "/" : "/dashboard");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "Email atau password salah";
+      setError("email", { message: msg });
+    }
   };
 
   return (
@@ -67,9 +60,6 @@ export default function LoginForm() {
         <Button tittle="Masuk" type="submit" isLoading={isSubmitting} className="w-full mt-4" />
       </form>
 
-      <p className="text-xs text-stone-400 text-center mt-4">
-        Demo: password bebas. Role ditentukan dari email — lihat daftar akun admin di menu &quot;Kelola Admin&quot;.
-      </p>
       <p className="text-sm text-stone-500 text-center mt-6">
         Belum punya akun? <Link to="/register" className="text-brand-600 font-semibold">Daftar</Link>
       </p>

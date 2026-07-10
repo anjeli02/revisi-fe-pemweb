@@ -7,49 +7,57 @@
 // 2. Hapus persist() pada useAdminStore.ts kalau datanya sudah datang dari server.
 
 import { api } from "../lib/axios";
-import type { Criteria, Product, HistoryEntry, WeightMap } from "../types/skincare";
+
+//login & register
+export async function loginApi(email: string, password: string) {
+  const res = await api.post("/auth/login", { email, password });
+  const data = res.data;
+  // konversi id dari number ke string
+  data.user.id = String(data.user.id);
+  return data;
+}
+
+export async function registerApi(username: string, email: string, password: string) {
+  const res = await api.post("/auth/register", { username, email, password });
+  const data = res.data;
+  // konversi id dari number ke string
+  data.user.id = String(data.user.id);
+  return data;
+}
 
 // ----- Produk -----
-export async function getProducts(): Promise<Product[]> {
+export async function getProducts() {
   const res = await api.get("/products");
   return res.data;
 }
 
-export async function createProduct(payload: Omit<Product, "id">): Promise<Product> {
-  const res = await api.post("/products", payload);
+export async function getProductById(id: number) {
+  const res = await api.get(`/products/${id}`);
   return res.data;
-}
-
-export async function updateProductApi(id: string, payload: Partial<Product>): Promise<Product> {
-  const res = await api.put(`/products/${id}`, payload);
-  return res.data;
-}
-
-export async function deleteProductApi(id: string): Promise<void> {
-  await api.delete(`/products/${id}`);
 }
 
 // ----- Kriteria -----
-export async function getCriteria(): Promise<Criteria[]> {
-  const res = await api.get("/criteria");
+export async function getKriteria() {
+  const res = await api.get("/kriteria");
   return res.data;
 }
 
-export async function updateCriteriaWeightApi(key: Criteria["key"], weight: number): Promise<Criteria> {
-  const res = await api.put(`/criteria/${key}`, { defaultWeight: weight });
+// ----- SPK / Rekomendasi -----
+export async function postRecommendation(input: {
+  inputHarga: number;
+  inputJenisKulit: number;
+  inputMasalahKulit: number;
+  inputKandungan: number;
+  inputBpom: number;
+}) {
+  const res = await api.post("/spk/calculate", input);
   return res.data;
-}
-
-// ----- Rekomendasi (SAW dihitung di backend) -----
-export async function postRecommendation(weights: WeightMap): Promise<{
-  results: (Product & { finalScore: number; rank: number })[];
-}> {
-  const res = await api.post("/recommendations", { weights });
-  return res.data;
+  // res.data.topRekomendasi = array top 10 produk
+  // res.data.semua = semua produk terurut
 }
 
 // ----- Riwayat -----
-export async function getHistory(): Promise<HistoryEntry[]> {
-  const res = await api.get("/recommendations/history");
+export async function getHistory() {
+  const res = await api.get("/history");
   return res.data;
 }
