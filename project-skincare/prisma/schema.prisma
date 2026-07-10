@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String
+  email     String    @unique
+  password  String
+  histories History[]
+  ratings   Rating[]
+  createAt  DateTime  @default(now())
+}
+
+model Product {
+  id                Int       @id @default(autoincrement())
+  kode              String    @unique
+  name              String
+  brand             String
+  nilaiHarga        Int
+  nilaiJenisKulit   Int
+  nilaiMasalahKulit Int
+  nilaiKandungan    Int
+  nilaiBpom         Int
+  isActive          Boolean   @default(true)
+  ratings           Rating[]
+  createdAt         DateTime @default(now())
+}
+
+model Rating {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  productId    Int
+  product      Product  @relation(fields: [productId], references: [id])
+  kualitas     Int      // 1-5
+  popularitas  Int      // 1-5
+  desain       Int      // 1-5
+  review       String?  @db.Text
+  createdAt    DateTime @default(now())
+}
+
+model History {
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  user              User      @relation(fields: [userId], references: [id])    
+  inputHarga        Int
+  inputJenisKulit   Int
+  inputMasalahKulit Int
+  inputKandungan    Int
+  hasilJson         Json
+  createAt          DateTime @default(now())
+}
+
+model Bobot {
+  id                Int      @id @default(autoincrement())
+  bobotHarga        Float    // default 0.20
+  bobotJenisKulit   Float    // default 0.25
+  bobotMasalahKulit Float    // default 0.25
+  bobotKandungan    Float    // default 0.20
+  bobotBpom         Float    // default 0.10
+  updatedAt         DateTime @updatedAt
+}
