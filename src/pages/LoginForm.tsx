@@ -27,24 +27,33 @@ export default function LoginForm() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    try {
-      const result = await loginApi(data.email, data.password);
-      login({
-        user: {
-          id: result.user.id,
-          name: result.user.username,
-          email: result.user.email,
-          role: result.user.role ?? "user",
-        },
-        token: result.token,
-      });
-      const role = result.user.role ?? "user";
-      navigate(role === "user" ? "/" : "/dashboard");
-    } catch (error: any) {
-      const msg = error?.response?.data?.message || "Email atau password salah";
-      setError("email", { message: msg });
+  try {
+    const result = await loginApi(data.email, data.password);
+    login({
+      user: {
+        id: String(result.user.id),
+        name: result.user.username,
+        email: result.user.email,
+        role: result.user.role ?? "user",
+      },
+      token: result.token,
+    });
+
+    const role = result.user.role ?? "user";
+
+    // Arahkan berdasarkan role
+    if (role === "super_admin") {
+      navigate("/dashboard");
+    } else if (role === "admin") {
+      navigate("/dashboard");
+    } else {
+      navigate("/");
     }
-  };
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || "Email atau password salah";
+    setError("email", { message: msg });
+  }
+};
 
   return (
     <div className="max-w-md mx-auto py-10">

@@ -1,9 +1,20 @@
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { useAdminStore } from "../../../store/useAdminStore";
+import { useEffect, useState } from "react";
+import { getProducts, deleteProductApi } from "../../../services/skincareApi";
 
 export default function ProdukIndex() {
-  const { products, deleteProduct } = useAdminStore();
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Hapus produk ini?")) return;
+    await deleteProductApi(String(id));
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+  };
 
   return (
     <div>
@@ -26,7 +37,7 @@ export default function ProdukIndex() {
             <tr className="text-left text-stone-400 border-b border-stone-100">
               <th className="px-5 py-3">Kode</th>
               <th className="px-5 py-3">Produk</th>
-              <th className="px-5 py-3">Kategori</th>
+              <th className="px-5 py-3">Brand</th>
               <th className="px-5 py-3">C1</th>
               <th className="px-5 py-3">C2</th>
               <th className="px-5 py-3">C3</th>
@@ -38,20 +49,20 @@ export default function ProdukIndex() {
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-b border-stone-50 hover:bg-rose-50/40">
-                <td className="px-5 py-3 text-stone-400">{p.code}</td>
-                <td className="px-5 py-3 font-semibold text-stone-700">{p.name}</td>
-                <td className="px-5 py-3 text-stone-500">{p.category}</td>
-                <td className="px-5 py-3">{p.harga}</td>
-                <td className="px-5 py-3">{p.jenisKulit}</td>
-                <td className="px-5 py-3">{p.masalahKulit}</td>
-                <td className="px-5 py-3">{p.kandunganAktif}</td>
-                <td className="px-5 py-3">{p.bpom}</td>
+                <td className="px-5 py-3 text-stone-400">{p.kode}</td>
+                <td className="px-5 py-3 font-semibold text-stone-700">{p.nama}</td>
+                <td className="px-5 py-3 text-stone-500">{p.brand?.nama}</td>
+                <td className="px-5 py-3">{p.nilaiHarga}</td>
+                <td className="px-5 py-3">{p.nilaiJenisKulit}</td>
+                <td className="px-5 py-3">{p.nilaiMasalahKulit}</td>
+                <td className="px-5 py-3">{p.nilaiKandungan}</td>
+                <td className="px-5 py-3">{p.nilaiBpom}</td>
                 <td className="px-5 py-3 text-right whitespace-nowrap">
                   <Link to={`/dashboard/produk/edit/${p.id}`} className="text-brand-500 hover:underline mr-3 inline-flex items-center gap-1">
                     <Pencil size={14} /> Edit
                   </Link>
                   <button
-                    onClick={() => confirm("Hapus produk ini?") && deleteProduct(p.id)}
+                    onClick={() => handleDelete(p.id)}
                     className="text-stone-400 hover:text-rose-600 hover:underline inline-flex items-center gap-1"
                   >
                     <Trash2 size={14} /> Hapus

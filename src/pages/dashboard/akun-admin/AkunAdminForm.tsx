@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import Button from "../../../component/ui/Button";
 import InputText from "../../../component/ui/InputText";
 import SelectInput from "../../../component/ui/SelectInput";
-import { useAdminAccountsStore } from "../../../store/useAdminAccounts";
-import { uid } from "../../../lib/uid";
-import type { AdminAccount } from "../../../types/adminAccounts";
+import { createUserApi, updateUserApi } from "../../../services/skincareApi";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
@@ -13,53 +12,72 @@ const ROLE_OPTIONS = [
 ];
 
 type FormValues = {
-  name: string;
+  username: string;
   email: string;
+  password: string;
   role: string;
 };
 
-export default function AkunAdminForm({ existing }: { existing?: AdminAccount }) {
+interface ExistingAccount {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
+export default function AkunAdminForm({ existing }: { existing?: ExistingAccount }) {
   const navigate = useNavigate();
-  const { admins, addAdmin, updateAdmin } = useAdminAccountsStore();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: existing
-      ? { name: existing.name, email: existing.email, role: existing.role }
-      : { name: "", email: "", role: "admin" },
+      ? { username: existing.username, email: existing.email, password: "", role: existing.role }
+      : { username: "", email: "", password: "", role: "admin" },
   });
 
-  const onSubmit = (data: FormValues) => {
-    const email = data.email.trim().toLowerCase();
-    if (!email) {
-      alert('Email wajib diisi — email ini yang menentukan role saat login demo.');
-      return;
+  const onSubmit = async (data: FormValues) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (existing) {
+        await updateUserApi(existing.id, {
+          username: data.username,
+          email: data.email,
+          role: data.role,
+          ...(data.password ? { password: data.password } : {}),
+        });
+      } else {
+        if (!data.password) {
+          setError("Password wajib diisi untuk akun baru");
+          return;
+        }
+        await createUserApi({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          role: data.role,
+        });
+      }
+      navigate("/dashboard/akun-admin");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Gagal menyimpan akun");
+    } finally {
+      setLoading(false);
     }
-    const duplicate = admins.find((a) => a.email.toLowerCase() === email && a.id !== existing?.id);
-    if (duplicate) {
-      alert("Email ini sudah dipakai akun admin lain.");
-      return;
-    }
-
-    const payload: AdminAccount = {
-      id: existing?.id ?? uid("acc"),
-      name: data.name || "Admin Baru",
-      email,
-      role: data.role === "super_admin" ? "super_admin" : "admin",
-      createdAt: existing?.createdAt ?? new Date().toISOString(),
-    };
-    if (existing) updateAdmin(payload);
-    else addAdmin(payload);
-    navigate("/dashboard/akun-admin");
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-1">
-      <InputText label="Nama" nama="name" register={register} />
-      <InputText label="Email (dipakai untuk login demo)" nama="email" register={register} />
+      <InputText label="Nama" nama="username" register={register} />
+      <InputText label="Email" nama="email" register={register} />
+      <InputText label={existing ? "Password Baru (kosongkan jika tidak diubah)" : "Password"} nama="password" register={register} />
       <SelectInput label="Role" nama="role" register={register} options={ROLE_OPTIONS} />
 
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
       <div className="flex gap-3 pt-4">
-        <Button tittle={existing ? "Simpan Perubahan" : "Tambah Admin"} type="submit" />
+        <Button tittle={loading ? "Menyimpan..." : existing ? "Simpan Perubahan" : "Tambah Admin"} type="submit" />
         <button
           type="button"
           onClick={() => navigate("/dashboard/akun-admin")}

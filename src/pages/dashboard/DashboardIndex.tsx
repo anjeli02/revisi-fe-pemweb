@@ -1,14 +1,31 @@
 import { Link } from "react-router-dom";
 import { Package, SlidersHorizontal, History, Workflow } from "lucide-react";
-import { useAdminStore } from "../../store/useAdminStore";
+import { useEffect, useState } from "react";
+import { getProducts, getKriteria, getAllHistory } from "../../services/skincareApi";
 
 export default function DashboardIndex() {
-  const { products, criteria, history } = useAdminStore();
+  const [productCount, setProductCount] = useState(0);
+  const [kriteriaCount, setKriteriaCount] = useState(0);
+  const [historyCount, setHistoryCount] = useState(0);
+
+  useEffect(() => {
+    getProducts()
+      .then((data) => setProductCount(data.length))
+      .catch(() => setProductCount(0));
+
+    getKriteria()
+      .then((data) => setKriteriaCount(data.length))
+      .catch(() => setKriteriaCount(0));
+
+    getAllHistory()
+      .then((data) => setHistoryCount(data.length))
+      .catch(() => setHistoryCount(0));
+  }, []);
 
   const stats = [
-    { label: "Produk Terdaftar", value: products.length, to: "/dashboard/produk", Icon: Package },
-    { label: "Kriteria SAW Aktif", value: criteria.length, to: "/dashboard/kriteria", Icon: SlidersHorizontal },
-    { label: "Riwayat Konsultasi", value: history.length, to: "/dashboard/riwayat", Icon: History },
+    { label: "Produk Terdaftar",    value: productCount,  to: "/dashboard/produk",   Icon: Package },
+    { label: "Kriteria SAW Aktif",  value: kriteriaCount, to: "/dashboard/kriteria", Icon: SlidersHorizontal },
+    { label: "Riwayat Konsultasi",  value: historyCount,  to: "/dashboard/riwayat",  Icon: History },
   ];
 
   return (
@@ -18,7 +35,11 @@ export default function DashboardIndex() {
 
       <div className="grid sm:grid-cols-3 gap-5 mb-10">
         {stats.map(({ label, value, to, Icon }) => (
-          <Link key={label} to={to} className="bg-white border border-rose-50 rounded-3xl p-6 hover:shadow-[0_10px_30px_-10px_rgba(240,77,110,0.25)] transition">
+          <Link
+            key={label}
+            to={to}
+            className="bg-white border border-rose-50 rounded-3xl p-6 hover:shadow-[0_10px_30px_-10px_rgba(240,77,110,0.25)] transition"
+          >
             <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-3">
               <Icon className="text-brand-500" size={20} />
             </div>

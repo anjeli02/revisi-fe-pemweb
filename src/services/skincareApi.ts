@@ -36,6 +36,37 @@ export async function getProductById(id: number) {
   return res.data;
 }
 
+// ----- Produk CRUD -----
+export async function createProductApi(payload: {
+  kode: string;
+  nama: string;
+  brandId: number;
+  nilaiHarga: number;
+  nilaiJenisKulit: number;
+  nilaiMasalahKulit: number;
+  nilaiKandungan: number;
+  nilaiBpom: number;
+}) {
+  const res = await api.post("/products", payload);
+  return res.data;
+}
+
+export async function updateProductApi(id: string, payload: {
+  nama?: string;
+  nilaiHarga?: number;
+  nilaiJenisKulit?: number;
+  nilaiMasalahKulit?: number;
+  nilaiKandungan?: number;
+  nilaiBpom?: number;
+}) {
+  const res = await api.put(`/products/${id}`, payload);
+  return res.data;
+}
+
+export async function deleteProductApi(id: string): Promise<void> {
+  await api.delete(`/products/${id}`);
+}
+
 // ----- Kriteria -----
 export async function getKriteria() {
   const res = await api.get("/kriteria");
@@ -59,5 +90,40 @@ export async function postRecommendation(input: {
 // ----- Riwayat -----
 export async function getHistory() {
   const res = await api.get("/history");
+  return res.data;
+}
+
+// ----- Users/Admin -----
+export async function getUsers() {
+  const res = await api.get("/users");
+  return res.data;
+}
+
+export async function createUserApi(payload: {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+}) {
+  const res = await api.post("/users", payload);
+  return res.data;
+}
+
+export async function updateUserApi(id: number, payload: {
+  username?: string;
+  email?: string;
+  role?: string;
+  password?: string;
+}) {
+  const res = await api.put(`/users/${id}`, payload);
+  return res.data;
+}
+
+export async function deleteUserApi(id: number) {
+  await api.delete(`/users/${id}`);
+}
+
+export async function getAllHistory() {
+  const res = await api.get("/history/all");
   return res.data;
 }

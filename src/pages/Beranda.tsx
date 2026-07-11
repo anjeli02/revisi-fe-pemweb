@@ -6,7 +6,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Collapse } from "../component/ui/Collapse";
-import { useAdminStore } from "../store/useAdminStore";
+import { useEffect, useState } from "react";
+import { getProducts } from "../services/skincareApi";
 import { useAuthStore } from "../store/useAuthStore";
 
 // ─── Data statis ─────────────────────────────────────────────────────────────
@@ -119,7 +120,10 @@ function StarRating({ count }: { count: number }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Beranda() {
-  const { products } = useAdminStore();
+  const [products, setProducts] = useState<any[]>([]);
+  useEffect(() => {
+    getProducts().then(setProducts).catch(() => setProducts([]));
+  }, []);
   const { isAuthenticated } = useAuthStore();
 
   return (

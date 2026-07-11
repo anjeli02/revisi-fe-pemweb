@@ -1,19 +1,32 @@
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, ShieldCheck } from "lucide-react";
-import { useAdminAccountsStore } from "../../../store/useAdminAccounts";
+import { useEffect, useState } from "react";
+import { getUsers, deleteUserApi } from "../../../services/skincareApi";
 
 export default function AkunAdminIndex() {
-  const { admins, deleteAdmin } = useAdminAccountsStore();
+  const [admins, setAdmins] = useState<any[]>([]);
+
+  useEffect(() => {
+    getUsers().then((data) =>
+      setAdmins(data.filter((u: any) => u.role === "admin" || u.role === "super_admin"))
+    );
+  }, []);
+
   const superAdminCount = admins.filter((a) => a.role === "super_admin").length;
+
+  const handleDelete = async (id: number, role: string) => {
+    if (role === "super_admin" && superAdminCount <= 1) return;
+    if (!confirm("Hapus akun ini?")) return;
+    await deleteUserApi(id);
+    setAdmins((prev) => prev.filter((a) => a.id !== id));
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
         <div>
           <h1 className="font-display text-2xl font-bold text-stone-800">Kelola Admin</h1>
-          <p className="text-sm text-stone-500">
-            {admins.length} akun terdaftar &middot; role saat login dicocokkan dari email di daftar ini
-          </p>
+          <p className="text-sm text-stone-500">{admins.length} akun terdaftar</p>
         </div>
         <Link
           to="/dashboard/akun-admin/create"
@@ -38,37 +51,25 @@ export default function AkunAdminIndex() {
               const isLastSuperAdmin = a.role === "super_admin" && superAdminCount <= 1;
               return (
                 <tr key={a.id} className="border-b border-stone-50 hover:bg-rose-50/40">
-                  <td className="px-5 py-3 font-semibold text-stone-700">{a.name}</td>
+                  <td className="px-5 py-3 font-semibold text-stone-700">{a.username}</td>
                   <td className="px-5 py-3 text-stone-500">{a.email}</td>
                   <td className="px-5 py-3">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        a.role === "super_admin" ? "bg-amber-50 text-amber-600" : "bg-brand-50 text-brand-600"
-                      }`}
-                    >
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      a.role === "super_admin" ? "bg-amber-50 text-amber-600" : "bg-brand-50 text-brand-600"
+                    }`}>
                       <ShieldCheck size={12} /> {a.role === "super_admin" ? "Super Admin" : "Admin"}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right whitespace-nowrap">
-                    <Link
-                      to={`/dashboard/akun-admin/edit/${a.id}`}
-                      className="text-brand-500 hover:underline mr-3 inline-flex items-center gap-1"
-                    >
+                    <Link to={`/dashboard/akun-admin/edit/${a.id}`} className="text-brand-500 hover:underline mr-3 inline-flex items-center gap-1">
                       <Pencil size={14} /> Edit
                     </Link>
                     <button
                       type="button"
                       disabled={isLastSuperAdmin}
-                      title={isLastSuperAdmin ? "Tidak bisa hapus super admin terakhir" : undefined}
-                      onClick={() => {
-                        if (isLastSuperAdmin) return;
-                        if (!a.id) return;
-                        if (confirm(`Hapus akun ${a.email}?`)) deleteAdmin(a.id as string);
-                      }}
+                      onClick={() => handleDelete(a.id, a.role)}
                       className={`inline-flex items-center gap-1 ${
-                        isLastSuperAdmin
-                          ? "text-stone-300 cursor-not-allowed"
-                          : "text-stone-400 hover:text-rose-600 hover:underline"
+                        isLastSuperAdmin ? "text-stone-300 cursor-not-allowed" : "text-stone-400 hover:text-rose-600 hover:underline"
                       }`}
                     >
                       <Trash2 size={14} /> Hapus

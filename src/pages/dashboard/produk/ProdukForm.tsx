@@ -1,75 +1,119 @@
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
 import Button from "../../../component/ui/Button";
 import InputText from "../../../component/ui/InputText";
 import SelectInput from "../../../component/ui/SelectInput";
-import { useAdminStore } from "../../../store/useAdminStore";
-import { uid } from "../../../lib/uid";
-import type { Product } from "../../../types/skincare";
+import { createProductApi, updateProductApi } from "../../../services/skincareApi";
+import { api } from "../../../lib/axios";
 
-const CATEGORY_OPTIONS = ["Pembersih", "Toner", "Serum", "Pelembap", "Sunscreen", "Masker"].map((c) => ({ value: c, label: c }));
 const SCALE_OPTIONS = [1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }));
 
 type FormValues = {
-  name: string;
-  category: string;
-  harga: string;
-  jenisKulit: string;
-  masalahKulit: string;
-  kandunganAktif: string;
-  bpom: string;
+  nama: string;
+  kode: string;
+  brandId: string;
+  nilaiHarga: string;
+  nilaiJenisKulit: string;
+  nilaiMasalahKulit: string;
+  nilaiKandungan: string;
+  nilaiBpom: string;
 };
 
-export default function ProductForm({ existing }: { existing?: Product }) {
+interface ExistingProduct {
+  id: number;
+  kode: string;
+  nama: string;
+  brandId: number;
+  nilaiHarga: number;
+  nilaiJenisKulit: number;
+  nilaiMasalahKulit: number;
+  nilaiKandungan: number;
+  nilaiBpom: number;
+}
+
+export default function ProductForm({ existing }: { existing?: ExistingProduct }) {
   const navigate = useNavigate();
-  const { addProduct, updateProduct } = useAdminStore();
+  const [brands, setBrands] = useState<{ value: string; label: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get("/brands").then((res) => {
+      setBrands(res.data.map((b: any) => ({ value: String(b.id), label: b.nama })));
+    });
+  }, []);
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: existing
       ? {
-          name: existing.name,
-          category: existing.category,
-          harga: String(existing.harga),
-          jenisKulit: String(existing.jenisKulit),
-          masalahKulit: String(existing.masalahKulit),
-          kandunganAktif: String(existing.kandunganAktif),
-          bpom: String(existing.bpom),
+          nama:             existing.nama,
+          kode:             existing.kode,
+          brandId:          String(existing.brandId),
+          nilaiHarga:       String(existing.nilaiHarga),
+          nilaiJenisKulit:  String(existing.nilaiJenisKulit),
+          nilaiMasalahKulit:String(existing.nilaiMasalahKulit),
+          nilaiKandungan:   String(existing.nilaiKandungan),
+          nilaiBpom:        String(existing.nilaiBpom),
         }
-      : { name: "", category: "Pelembap", harga: "3", jenisKulit: "3", masalahKulit: "3", kandunganAktif: "3", bpom: "5" },
+      : {
+          nama: "", kode: "", brandId: "",
+          nilaiHarga: "3", nilaiJenisKulit: "3",
+          nilaiMasalahKulit: "3", nilaiKandungan: "3", nilaiBpom: "5",
+        },
   });
 
-  const onSubmit = (data: FormValues) => {
-    const payload: Product = {
-      id: existing?.id ?? uid("p"),
-      code: existing?.code ?? "A" + uid(""),
-      name: data.name || "Produk Baru",
-      category: data.category,
-      harga: Number(data.harga),
-      jenisKulit: Number(data.jenisKulit),
-      masalahKulit: Number(data.masalahKulit),
-      kandunganAktif: Number(data.kandunganAktif),
-      bpom: Number(data.bpom),
-    };
-    if (existing) updateProduct(payload);
-    else addProduct(payload);
-    navigate("/dashboard/produk");
+  const onSubmit = async (data: FormValues) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (existing) {
+        await updateProductApi(String(existing.id), {
+          nama:              data.nama,
+          nilaiHarga:        Number(data.nilaiHarga),
+          nilaiJenisKulit:   Number(data.nilaiJenisKulit),
+          nilaiMasalahKulit: Number(data.nilaiMasalahKulit),
+          nilaiKandungan:    Number(data.nilaiKandungan),
+          nilaiBpom:         Number(data.nilaiBpom),
+        });
+      } else {
+        await createProductApi({
+          kode:              data.kode,
+          nama:              data.nama,
+          brandId:           Number(data.brandId),
+          nilaiHarga:        Number(data.nilaiHarga),
+          nilaiJenisKulit:   Number(data.nilaiJenisKulit),
+          nilaiMasalahKulit: Number(data.nilaiMasalahKulit),
+          nilaiKandungan:    Number(data.nilaiKandungan),
+          nilaiBpom:         Number(data.nilaiBpom),
+        });
+      }
+      navigate("/dashboard/produk");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Gagal menyimpan produk");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-1">
-      <InputText label="Nama Produk" nama="name" register={register} />
-      <SelectInput label="Kategori" nama="category" register={register} options={CATEGORY_OPTIONS} />
+      <InputText label="Nama Produk" nama="nama" register={register} />
+      {!existing && <InputText label="Kode Produk (contoh: A71)" nama="kode" register={register} />}
+      {!existing && <SelectInput label="Brand" nama="brandId" register={register} options={brands} />}
 
       <div className="grid grid-cols-2 gap-4 mt-3">
-        <SelectInput label="C1 Harga (Cost, 1-5)" nama="harga" register={register} options={SCALE_OPTIONS} />
-        <SelectInput label="C2 Jenis Kulit (Benefit, 1-5)" nama="jenisKulit" register={register} options={SCALE_OPTIONS} />
-        <SelectInput label="C3 Masalah Kulit (Benefit, 1-5)" nama="masalahKulit" register={register} options={SCALE_OPTIONS} />
-        <SelectInput label="C4 Kandungan Aktif (Benefit, 1-5)" nama="kandunganAktif" register={register} options={SCALE_OPTIONS} />
-        <SelectInput label="C5 Status BPOM (Benefit, 1-5)" nama="bpom" register={register} options={SCALE_OPTIONS} />
+        <SelectInput label="C1 Harga (Cost, 1-5)"            nama="nilaiHarga"        register={register} options={SCALE_OPTIONS} />
+        <SelectInput label="C2 Jenis Kulit (Benefit, 1-5)"   nama="nilaiJenisKulit"   register={register} options={SCALE_OPTIONS} />
+        <SelectInput label="C3 Masalah Kulit (Benefit, 1-5)" nama="nilaiMasalahKulit" register={register} options={SCALE_OPTIONS} />
+        <SelectInput label="C4 Kandungan Aktif (Benefit, 1-5)" nama="nilaiKandungan"  register={register} options={SCALE_OPTIONS} />
+        <SelectInput label="C5 Status BPOM (Benefit, 1-5)"   nama="nilaiBpom"         register={register} options={SCALE_OPTIONS} />
       </div>
 
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
       <div className="flex gap-3 pt-4">
-        <Button tittle={existing ? "Simpan Perubahan" : "Tambah Produk"} type="submit" />
+        <Button tittle={loading ? "Menyimpan..." : existing ? "Simpan Perubahan" : "Tambah Produk"} type="submit" />
         <button
           type="button"
           onClick={() => navigate("/dashboard/produk")}
