@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, SlidersHorizontal, History, LogOut, Sparkles, UserCog } from "lucide-react";
+import { LayoutDashboard, Package, SlidersHorizontal, History, LogOut, Sparkles, UserCog, Users } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import type { Role } from "../types/Auth";
 
@@ -16,6 +16,7 @@ const menu: MenuItem[] = [
     { to: "/dashboard/kriteria", label: "Kriteria SAW", icon: SlidersHorizontal, roles: ["admin", "super_admin"] },
     { to: "/dashboard/riwayat", label: "Riwayat Konsultasi", icon: History, roles: ["admin", "super_admin"] },
     { to: "/dashboard/akun-admin", label: "Kelola Admin", icon: UserCog, roles: ["super_admin"] },
+    { to: "/dashboard/kelola-user", label: "Kelola User", icon: Users, roles: ["super_admin"] },
 ];
 
 export default function DashboardLayout() {

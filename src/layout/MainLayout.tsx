@@ -42,7 +42,7 @@ export default function MainLayout() {
                         <ul className="space-y-2 text-stone-500">
                             <li><Link to="/" className="hover:text-brand-600 transition">Beranda</Link></li>
                             <li><Link to="/konsultasi" className="hover:text-brand-600 transition">Konsultasi</Link></li>
-                            <li><Link to="/katalog" className="hover:text-brand-600 transition">Katalog Produk</Link></li>
+                            <li><Link to="/katalog" className="hover:text-brand-600 transition">Produk</Link></li>
                             <li><Link to="/login" className="hover:text-brand-600 transition">Masuk</Link></li>
                             <li><Link to="/register" className="hover:text-brand-600 transition">Daftar</Link></li>
                         </ul>

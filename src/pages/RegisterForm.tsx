@@ -3,11 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import InputText from "../component/ui/InputText";
-import { Sparkles } from "lucide-react";
 import InputPassword from "../component/ui/InputPasword";
 import Button from "../component/ui/Button";
 import { useAuthStore } from "../store/useAuthStore";
 import { registerApi } from "../services/skincareApi";
+import logo from "../assets/logo.png";
 
 const schema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
@@ -48,7 +48,14 @@ export default function RegisterForm() {
 
   return (
     <div className="max-w-md mx-auto py-10">
-      <Sparkles className="text-brand-500 mx-auto mb-3" size={28} />
+      {/* Logo */}
+      <div className="flex flex-col items-center mb-0">
+        <img
+          src={logo}
+          alt="GlowMatch"
+          className="w-32 h-32 object-contain drop-shadow-lg mb-0"
+        />
+      </div>
       <h1 className="font-display text-2xl font-bold text-stone-800 text-center mb-1">Daftar Akun</h1>
       <p className="text-sm text-stone-500 text-center mb-7">Buat akun untuk mulai konsultasi skincare di GlowMatch.</p>
 

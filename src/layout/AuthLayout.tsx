@@ -1,21 +1,39 @@
 import { Outlet } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import loginImage from "../assets/skin care beauty tips.jpg";
 
 export default function AuthLayout() {
   return (
-    <div className="grid md:grid-cols-2 min-h-screen items-center bg-[#fffaf9]">
-      <div className="hidden md:flex bg-linear-to-br from-brand-50 to-peach-50 h-screen items-center justify-center flex-col gap-4">
-        <div className="w-20 h-20 rounded-3xl bg-white flex items-center justify-center">
-          <Sparkles className="text-brand-500" size={40} />
+    <div className="grid min-h-screen md:grid-cols-2 bg-[#fffaf9]">
+
+      {/* LEFT SIDE */}
+      <div className="relative hidden md:block overflow-hidden">
+
+        {/* Background Image */}
+        <img
+          src={loginImage}
+          alt="GlowMatch"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-200/60 via-pink-100/30 to-white/20"></div>
+
+        {/* Content */}
+        <div className="relative z-10 flex h-full flex-col justify-between p-12">
+
+
+
+
         </div>
-        <p className="font-display font-bold text-2xl text-brand-600">GlowMatch</p>
-        <p className="text-stone-500 max-w-xs text-center text-sm">
-          Rekomendasi skincare berbasis SPK — masuk untuk konsultasi, atau kelola data sebagai admin.
-        </p>
       </div>
-      <div className="p-6">
-        <Outlet />
+
+      {/* RIGHT SIDE */}
+      <div className="flex items-center justify-center bg-[#fffaf9] p-6">
+        <div className="w-full max-w-md">
+          <Outlet />
+        </div>
       </div>
+
     </div>
   );
 }

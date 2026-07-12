@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FlaskConical, Search } from "lucide-react";
 import { getProducts } from "../services/skincareApi";
 
-const CATEGORIES = ["Semua", "Serum", "Pembersih", "Pelembap", "Sunscreen", "Masker", "Toner"];
+const CATEGORIES = ["Semua"];
 
 export default function Katalog() {
   const [products, setProducts] = useState<any[]>([]);
@@ -20,7 +20,7 @@ export default function Katalog() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-stone-800 mb-2">Katalog Skincare</h1>
+        <h1 className="font-display text-3xl font-bold text-stone-800 mb-2">Skincare</h1>
         <p className="text-stone-500">
           Semua produk yang dianalisis oleh sistem rekomendasi GlowMatch ({products.length} produk).
         </p>

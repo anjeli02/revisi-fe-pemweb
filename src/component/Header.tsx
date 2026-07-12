@@ -1,12 +1,20 @@
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Sparkles, LogIn, UserPlus, LayoutDashboard, LogOut, User, ChevronDown } from "lucide-react";
+import {
+  LogIn,
+  UserPlus,
+  LayoutDashboard,
+  LogOut,
+  User,
+  ChevronDown,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
+import logo from "../assets/logo1.jpeg";
 
 const menuItems = [
   { label: "Beranda", href: "/" },
   { label: "Konsultasi", href: "/konsultasi" },
-  { label: "Katalog", href: "/katalog" },
+  { label: "Produk", href: "/katalog" },
 ];
 
 export const Header: React.FC = () => {
@@ -41,11 +49,21 @@ export const Header: React.FC = () => {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-rose-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
         {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-2 shrink-0">
-          <span className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center">
-            <Sparkles className="text-brand-500" size={18} />
-          </span>
-          <span className="font-display font-bold text-xl text-brand-600">GlowMatch</span>
+        <NavLink
+          to="/"
+          className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105"
+        >
+          <img
+            src={logo}
+            alt="GlowMatch"
+            className="w-12 h-12 object-contain"
+          />
+
+          <div className="leading-tight">
+            <h1 className="font-display font-bold text-2xl text-brand-600">
+              GlowMatch
+            </h1>
+          </div>
         </NavLink>
 
         {/* Nav */}

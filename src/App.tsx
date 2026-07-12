@@ -24,6 +24,9 @@ import RiwayatIndex from "./pages/dashboard/riwayat/RiwayatIndex";
 import AkunAdminIndex from "./pages/dashboard/akun-admin/AkunAdminIndex";
 import AkunAdminCreate from "./pages/dashboard/akun-admin/AkunAdminCreate";
 import AkunAdminEdit from "./pages/dashboard/akun-admin/AkunAdminEdit";
+import KelolaUserIndex from "./pages/dashboard/kelola-user/KelolaUserIndex";
+import KelolaUserCreate from "./pages/dashboard/kelola-user/KelolaUserCreate";
+import KelolaUserEdit from "./pages/dashboard/kelola-user/KelolaUserEdit";
 
 function App() {
   return (
@@ -59,6 +62,9 @@ function App() {
             <Route path="akun-admin" element={<AkunAdminIndex />} />
             <Route path="akun-admin/create" element={<AkunAdminCreate />} />
             <Route path="akun-admin/edit/:id" element={<AkunAdminEdit />} />
+            <Route path="kelola-user" element={<KelolaUserIndex />} />
+            <Route path="kelola-user/create" element={<KelolaUserCreate />} />
+            <Route path="kelola-user/edit/:id" element={<KelolaUserEdit />} />
           </Route>
         </Route>
       </Routes>
