@@ -90,23 +90,11 @@ export default function DashboardIndex() {
 
   // ── Fetch ──
   useEffect(() => {
-    Promise.all([getProducts(), getKriteria(), getAllHistory()])
-      .then(([p, k, h]) => {
-        setProducts(p);
-        setProductCount(p.length);
-        setKriteria(k);
-        setKriteriaCount(k.length);
-        setHistoryCount(h.length);
-        // init bobot dari API
-        if (k.length === 5) {
-          setBobots(k.map((c: ApiKriteria) => Math.round(c.bobot * 100)));
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setErrMsg("Gagal memuat data dari server. Pastikan backend berjalan.");
-        setLoading(false);
-      });
+    
+    getProducts().then((d) => setProductCount(d.length)).catch(() => {});
+    getKriteria().then((d) => setKriteriaCount(d.length)).catch(() => {});
+    getAllHistory().then((d) => setHistoryCount(d.length)).catch(() => {});
+
   }, []);
 
   // ── Filter matriks ──

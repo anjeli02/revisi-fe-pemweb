@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface InputPasswordProps {
     label: string;
@@ -19,18 +20,21 @@ const InputPassword: React.FC<InputPasswordProps> = ({ label, nama, register, er
                     type={show ? "text" : "password"}  
                     {...register(nama)} 
                     placeholder={label} 
-                    className={`w-full border-2 p-2.5 rounded-xl outline-none pr-14
+                    className={`w-full border-2 p-2.5 rounded-xl outline-none pr-12
                     ${error 
                         ? "border-red-500 bg-red-50 focus:ring-2 focus:ring-red-300" 
                         : "border-stone-200 focus:ring-2 focus:ring-brand-200 focus:border-brand-400"
                     }`}
                 />
 
-                <button type="button" 
+                <button
+                    type="button"
                     onClick={() => setShow(!show)}
-                    className="absolute right-2 top-2 text-sm"
-                    >
-                    {show ? "Hide" : "Show"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition"
+                    tabIndex={-1}
+                    aria-label={show ? "Sembunyikan password" : "Tampilkan password"}
+                >
+                    {show ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
             </div>
             

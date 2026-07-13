@@ -25,6 +25,7 @@ export default function RiwayatIndex() {
             <thead>
               <tr className="text-left text-stone-400 border-b border-stone-100">
                 <th className="px-5 py-3">Tanggal</th>
+                <th className="px-5 py-3">User</th>
                 <th className="px-5 py-3">Harga</th>
                 <th className="px-5 py-3">Jenis Kulit</th>
                 <th className="px-5 py-3">Masalah Kulit</th>
@@ -38,7 +39,13 @@ export default function RiwayatIndex() {
                 const top = Array.isArray(h.hasilJson) ? h.hasilJson[0] : null;
                 return (
                   <tr key={h.id} className="border-b border-stone-50">
-                    <td className="px-5 py-3 text-stone-500">{new Date(h.createAt).toLocaleString("id-ID")}</td>
+                    <td className="px-5 py-3 text-stone-500">
+                      {new Date(h.createAt).toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="font-semibold text-stone-700">{h.user?.username ?? "-"}</div>
+                      <div className="text-xs text-stone-400">{h.user?.email ?? ""}</div>
+                    </td>
                     <td className="px-5 py-3">{h.inputHarga}</td>
                     <td className="px-5 py-3">{h.inputJenisKulit}</td>
                     <td className="px-5 py-3">{h.inputMasalahKulit}</td>

@@ -127,3 +127,34 @@ export async function getAllHistory() {
   const res = await api.get("/history/all");
   return res.data;
 }
+
+// ----- Rating -----
+export async function postRating(payload: {
+  productId: number;
+  kualitas: number;
+  popularitas: number;
+  desain: number;
+  review?: string;
+}) {
+  const res = await api.post("/ratings", payload);
+  return res.data;
+}
+
+export async function getRatingsByProductApi(productId: number | string) {
+  const res = await api.get(`/ratings/product/${productId}`);
+  return res.data;
+}
+
+export async function getAllRatingsApi() {
+  const res = await api.get("/ratings");
+  return res.data;
+}
+
+export async function deleteRatingApi(id: number) {
+  await api.delete(`/ratings/${id}`);
+}
+
+export async function getTestimonialsApi() {
+  const res = await api.get("/ratings/testimonials");
+  return res.data;
+}

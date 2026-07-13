@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import logo from "../assets/logo1.jpeg";
+import logo from "../assets/logo.png";
 
 const menuItems = [
   { label: "Beranda", href: "/" },

@@ -27,6 +27,8 @@ import AkunAdminEdit from "./pages/dashboard/akun-admin/AkunAdminEdit";
 import KelolaUserIndex from "./pages/dashboard/kelola-user/KelolaUserIndex";
 import KelolaUserCreate from "./pages/dashboard/kelola-user/KelolaUserCreate";
 import KelolaUserEdit from "./pages/dashboard/kelola-user/KelolaUserEdit";
+import SpkIndex from "./pages/dashboard/spk/SpkIndex";
+import RatingIndex from "./pages/dashboard/rating/RatingIndex";
 
 function App() {
   return (
@@ -54,6 +56,7 @@ function App() {
             <Route path="produk/edit/:id" element={<ProdukEdit />} />
             <Route path="kriteria" element={<KriteriaIndex />} />
             <Route path="riwayat" element={<RiwayatIndex />} />
+            <Route path="spk" element={<SpkIndex />} />
           </Route>
         </Route>
 
@@ -65,6 +68,8 @@ function App() {
             <Route path="kelola-user" element={<KelolaUserIndex />} />
             <Route path="kelola-user/create" element={<KelolaUserCreate />} />
             <Route path="kelola-user/edit/:id" element={<KelolaUserEdit />} />
+            <Route path="spk" element={<SpkIndex />} />
+            <Route path="rating" element={<RatingIndex />} />
           </Route>
         </Route>
       </Routes>
